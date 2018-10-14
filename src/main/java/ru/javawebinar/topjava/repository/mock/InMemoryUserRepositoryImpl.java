@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.repository.mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.UsersUtil;
@@ -23,24 +22,6 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
 
     {
         UsersUtil.USERS.forEach(this::save);
-    }
-
-    public static void main(String[] args) {
-        InMemoryUserRepositoryImpl impl = new InMemoryUserRepositoryImpl();
-        System.out.println(impl.repository);
-        System.out.println();
-        System.out.println(impl.repository.keySet());
-        System.out.println(impl.repository.values());
-        System.out.println(impl.delete(1));
-        System.out.println(impl.delete(4));
-        System.out.println(impl.repository.keySet());
-        System.out.println(impl.repository.values());
-        impl.save(new User(null, "Petr", "andrew@mail.ru", "12345", Role.ROLE_USER));
-        System.out.println(impl.repository);
-        System.out.println();
-        System.out.println(impl.getByEmail("andrew@mail.ru"));
-        System.out.println();
-        System.out.println(impl.getAll());
     }
 
     @Override
