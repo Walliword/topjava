@@ -1,38 +1,58 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealWithExceed;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
-import java.util.List;
+import java.util.Collection;
 
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
+import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 
 @Controller
-public class MealRestController extends AbstractMealRestController {
+public class MealRestController {
 
-    public List<MealWithExceed> getAll() {
-        List<Meal> meals = super.getAll(authUserId());
-        return MealsUtil.getWithExceeded(meals, authUserCaloriesPerDay());
+    protected final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final MealService mealService;
+
+    @Autowired
+    public MealRestController(MealService mealService) {
+        this.mealService = mealService;
+    }
+
+    public Collection<MealWithExceed> getAll() {
+        log.info("getAll", SecurityUtil.authUserId());
+        return MealsUtil.getWithExceeded(mealService.getAll(SecurityUtil.authUserId()), SecurityUtil.authUserCaloriesPerDay());
     }
 
     public Meal get(int id) {
-        return super.get(id, authUserId());
+        log.info("get {}", SecurityUtil.authUserId(), id);
+        return mealService.get(SecurityUtil.authUserId(), id);
     }
 
     public void delete(int id) {
-        super.delete(id, authUserId());
+        log.info("delete {}", SecurityUtil.authUserId(), id);
+        mealService.delete(SecurityUtil.authUserId(), id);
     }
 
-    @Override
+
     public Meal create(Meal meal) {
-        return super.create(meal);
+        log.info("create {}", SecurityUtil.authUserId(), meal);
+        checkNew(meal);
+        return mealService.create(SecurityUtil.authUserId(), meal);
     }
 
-    @Override
-    public void update(Meal meal) {
-        super.update(meal);
+
+    public void update(Meal meal, int id) {
+        log.info("update {} with id={}", SecurityUtil.authUserId(), meal, id);
+        assureIdConsistent(meal, id);
+        mealService.update(SecurityUtil.authUserId(), meal);
     }
 }
